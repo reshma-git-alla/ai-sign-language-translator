@@ -1,0 +1,14 @@
+{
+  "labels": [
+    "HELLO",
+    "THANK_YOU",
+    "YES",
+    "NO",
+    "PLEASE"
+  ],
+  "test_loss": 0.2207610011100769,
+  "test_accuracy": 0.9200000166893005,
+  "sequence_length": 30,
+  "landmark_dimension": 63,
+  "samples": 125
+}

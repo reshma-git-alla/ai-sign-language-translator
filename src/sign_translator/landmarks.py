@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-import cv2
 import mediapipe as mp
 import numpy as np
 
@@ -35,7 +34,36 @@ class HandTracker:
         )
 
     def process(self, frame: np.ndarray) -> DetectionResult:
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        rgb_frame = frame[:, :, ::-1]
+        if not rgb_frame.flags.c_contiguous:
+            rgb_frame = np.ascontiguousarray(rgb_frame)
+        results = self.hands.process(rgb_frame)
+        annotated = frame.copy()
+
+        if not results.multi_hand_landmarks:
+            return DetectionResult(annotated, None, None)
+
+        hand_landmarks = results.multi_hand_landmarks[0]
+        mp_drawing.draw_landmarks(
+            annotated,
+            hand_landmarks,
+            mp_hands.HAND_CONNECTIONS,
+            mp_styles.get_default_hand_landmarks_style(),
+            mp_styles.get_default_hand_connections_style(),
+        )
+
+        handedness = None
+        if results.multi_handedness:
+            handedness = results.multi_handedness[0].classification[0].label
+
+        return DetectionResult(
+            frame=annotated,
+            landmarks=normalize_landmarks(hand_landmarks),
+            handedness=handedness,
+        )
+
+    def process_rgb(self, frame: np.ndarray) -> DetectionResult:
+        rgb_frame = np.ascontiguousarray(frame)
         results = self.hands.process(rgb_frame)
         annotated = frame.copy()
 
@@ -73,4 +101,3 @@ def normalize_landmarks(hand_landmarks) -> np.ndarray:
     if max_value > 0:
         coords /= max_value
     return coords.flatten()
-

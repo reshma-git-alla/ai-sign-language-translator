@@ -1,8 +1,9 @@
 mediapipe==0.10.32
-opencv-python-headless==4.10.0.84
 numpy==1.26.4
 tensorflow-cpu==2.17.0
 scikit-learn==1.5.1
 matplotlib==3.9.2
 streamlit==1.44.1
 pandas==2.2.3
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
